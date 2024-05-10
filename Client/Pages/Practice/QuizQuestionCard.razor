@@ -11,7 +11,6 @@
     <div class="card-body">
         <h5 class="card-title">Translation</h5>
          
-
         <p class="card-text">What does @Question.Translated_word mean in @Question.Translated_language ?   </p>
 
         <form @onsubmit="() => CheckGuess(Question.Original_word)">
@@ -23,9 +22,8 @@
         </form>
         @if (correct == true)
         {
-            <p>correct translation</p>
+            <h3>Correct Translation!</h3>
         }
-
     </div>
     <div class="card-footer text-muted">
     </div>

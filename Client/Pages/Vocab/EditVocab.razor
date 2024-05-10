@@ -54,7 +54,7 @@ else
 	{
 		if (Id is not null)
 		{
-			var result = await Http.GetFromJsonAsync<Vocab>($"api/vocabs/{(int)Id}");
+			var result = await Http.GetFromJsonAsync<Vocab>($"api/vocabData/{(int)Id}");
 			if (result is not null)
 				newVocab = result;
 		}
@@ -65,12 +65,12 @@ else
 	{
 		if (Id is not null)
 		{
-			var result = await Http.PutAsJsonAsync($"api/vocabs/{Id}", newVocab);
+			var result = await Http.PutAsJsonAsync($"api/vocabData/{Id}", newVocab);
 			newVocab = await result.Content.ReadFromJsonAsync<Vocab>();
 		}
 		else
 		{
-			var result = await Http.PostAsJsonAsync("api/vocabs/", newVocab);
+			var result = await Http.PostAsJsonAsync("api/vocabData/", newVocab);
 			newVocab = await result.Content.ReadFromJsonAsync<Vocab>();
 		}
 	}

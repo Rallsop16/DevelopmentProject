@@ -28,7 +28,6 @@ else
                     <td>@stat.StatisticsId</td>
                     <td>@stat.Experience</td>
                     <td>@stat.Time</td>
-                    @* <td><button class="btn btn-primary" @onclick="@(() => ViewVocab(@collect.Id))"> View </button></td> *@
                 </tr>
             }
         </tbody>
@@ -52,7 +51,5 @@ else
         if (results is not null)
             StatisticsDetails = results;
     }
-
-
 }
 

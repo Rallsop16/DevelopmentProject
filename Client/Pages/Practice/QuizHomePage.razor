@@ -6,7 +6,7 @@
 
 @using DevelopmentProject.Shared.Entities
 
-<h3>Collections Overview</h3>
+<h3>Pick a Collection to Practice</h3>
 
 @if (userIdCollection.Count == 0)
 {
@@ -28,7 +28,7 @@ else
                 <tr>
                     <td>@collect.CollectionVocabId</td>
                     <td>@collect.CollectionVocabName</td>
-                    <td><button class="btn btn-primary" @onclick="@(() => PracticeCollection(@collect.CollectionVocabId))"> Edit </button></td>
+                    <td><button class="btn btn-primary" @onclick="@(() => PracticeCollection(@collect.CollectionVocabId))"> Practice </button></td>
                 </tr>
             }
         </tbody>
@@ -65,8 +65,4 @@ else
     {
         NavigationManager.NavigateTo($"quiz-collection/{Id}");
     }
-
-
-    
-   
 }

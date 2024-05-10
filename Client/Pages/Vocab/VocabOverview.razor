@@ -43,7 +43,7 @@ else
     </table>
 }
 
-<button class="btn btn-primary" @onclick="AddVocab">Add a new vocab </button>
+<button class="btn btn-primary" @onclick="AddVocab">Add new vocab </button>
 
 @code {
 
@@ -66,13 +66,13 @@ else
 
     async Task RemoveVocab(int Id)
     {
-        await Http.DeleteAsync($"api/vocabs/{Id}");
+        await Http.DeleteAsync($"api/vocabData/{Id}");
         await LoadVocabs();
     }
 
     async Task LoadVocabs()
     {
-        var results = await Http.GetFromJsonAsync<List<Vocab>>("api/vocabs");
+        var results = await Http.GetFromJsonAsync<List<Vocab>>("api/vocabData");
 
         if (results is not null)
         {

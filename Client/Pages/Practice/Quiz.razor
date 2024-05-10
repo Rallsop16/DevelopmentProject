@@ -24,19 +24,8 @@ else
     <p> no vocab to test</p>
 }
 
-<p> CollectionID:  @Id</p>
-<p> Score: @correctAnswers / @allVocabInCollection.Count</p>
 
-<h1> vocab in collectionID: @allVocabInCollection.Count()</h1>
-
-<p>All collection maps: @specificCollectionMaps.Count()</p>
-<p>All vocabs: @specificVocabs.Count()</p>
-<p>CollectionMaps with specfic collectionId @MapsWithId.Count()</p>
-
-@foreach(var num in vocabsToQuizIds)
-{
-    <h1>@num</h1>
-}
+<h2> Score: @correctAnswers / @allVocabInCollection.Count</h2>
 
 @code 
 {
@@ -68,7 +57,7 @@ else
         //load collectionMaps
         var results = await Http.GetFromJsonAsync<List<CollectionMap>>("api/collectionMaps");
         //loads all vocabs
-        var vocabResults = await Http.GetFromJsonAsync<List<Vocab>>("api/vocabs");
+        var vocabResults = await Http.GetFromJsonAsync<List<Vocab>>("api/vocabData");
 
         if(results is not null && vocabResults is not null)
         {
@@ -91,9 +80,6 @@ else
                 allVocabInCollection.AddRange(vocabInCollection);
             }
         }
-
-
-
     }
 
     void CheckGuess(bool isCorrect)
@@ -106,9 +92,5 @@ else
         {
 
         }
-        //questionNum++;
     }
-
-   
-
 }

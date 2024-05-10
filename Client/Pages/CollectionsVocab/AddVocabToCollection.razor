@@ -67,26 +67,19 @@ else
         newCollectionMap.CollectionVocabId = Id;
 
         var result = await Http.PostAsJsonAsync("api/collectionMaps/", newCollectionMap);
-        //newCollectMap = await result.Content.ReadFromJsonAsync<CollectionMap>();
-
-
     }
-
-   
 
     async Task LoadVocabs()
     {
-        var results = await Http.GetFromJsonAsync<List<Vocab>>("api/vocabs");
+        var results = await Http.GetFromJsonAsync<List<Vocab>>("api/vocabData");
 
         if (results is not null)
         {
             vocabDetails = results;
-            userIdVocab = vocabDetails.Where(x => x.UserId == 1).ToList(); //puts all the objects of UserId 1 in a list
+            //puts all the objects of UserId 1 in a list
+            userIdVocab = vocabDetails.Where(x => x.UserId == 1).ToList(); 
         }
-
-
     }
-
 }
 
 

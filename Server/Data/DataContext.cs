@@ -27,7 +27,7 @@ namespace DevelopmentProject.Data
             //---------------------------------Vocab-------------------------------------
             modelBuilder.Entity<Vocab>().HasData(
                 new Vocab {VocabId = 1, Original_word = "Horse", Translated_word = "Cheval", Original_language = "English", Translated_language = "French", UserId = 1 },
-                 new Vocab { VocabId = 98, Original_word = "DOG", Translated_word = "CHIEN", Original_language = "English", Translated_language = "French", UserId = 2 }
+                new Vocab { VocabId = 98, Original_word = "DOG", Translated_word = "CHIEN", Original_language = "English", Translated_language = "French", UserId = 2 }
                 );
 
             

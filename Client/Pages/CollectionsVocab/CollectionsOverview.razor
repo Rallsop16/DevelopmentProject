@@ -18,6 +18,8 @@ else
                 <th>Id</th>
                 <th>Collection Name</th>
                 <th></th>
+                <th></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -57,13 +59,13 @@ else
         if (results is not null)
         {
             collectionDetails = results;
-            userIdCollection = collectionDetails.Where(x => x.UserId == 1).ToList(); //puts all the objects of UserId 1 in a list
+            //puts all the objects of UserId 1 in a list
+            userIdCollection = collectionDetails.Where(x => x.UserId == 1).ToList(); 
         }
-    
         
     }
 
-
+    //passing collectionVocabId to edit page
     void EditCollection(int Id)
     {
         NavigationManager.NavigateTo($"edit-collection/{Id}");
@@ -81,7 +83,5 @@ else
     {
         await Http.DeleteAsync($"api/collectionData/{Id}");
         await LoadCollection();
-
-
 }
 }

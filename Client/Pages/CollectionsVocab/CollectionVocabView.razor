@@ -41,9 +41,7 @@ else
                     <td>@vocab.Translated_word</td>
                     <td>@vocab.Original_language</td>
                     <td>@vocab.Translated_language</td>
-                    @* <td><button class="btn btn-primary" @onclick="@(() => EditCollection(@collect.CollectionVocabId))"> Edit </button></td>*@
                     <td><button class="btn btn-danger" @onclick="@(() => RemoveVocab(@vocab.VocabId))"> Remove </button></td> 
-
                 </tr>
             }
         </tbody>
@@ -94,7 +92,7 @@ else
     async Task LoadCollectionMap()
     {
         var results = await Http.GetFromJsonAsync<List<CollectionMap>>("api/collectionMaps");
-        var vocabResults = await Http.GetFromJsonAsync<List<Vocab>>("api/vocabs");
+        var vocabResults = await Http.GetFromJsonAsync<List<Vocab>>("api/vocabData");
 
         if (results is not null && vocabResults is not null)
         {
@@ -113,10 +111,8 @@ else
             {
                 num = collectionVocabIds[i];
                 vocabInCollection = tempVocabs.Where(x => x.VocabId == num).ToList();
-                allVocabInCollection.AddRange(vocabInCollection);
-                //vocabInCollection = temp.Where(x => x.VocabId == i).ToList(); 
+                allVocabInCollection.AddRange(vocabInCollection); 
             }
-
         }
     }
 
@@ -129,10 +125,8 @@ else
 
     async Task HandleSubmit()
     {
-
         var result = await Http.PutAsJsonAsync($"api/collectionMaps/{Id}", newMap);
         newMap = await result.Content.ReadFromJsonAsync<CollectionMap>();
-
     }
 
     void AddVocabToCollection(int Id)
@@ -142,7 +136,6 @@ else
 
     async Task RemoveVocab(int Id)
     {
-        //NavigationManager.NavigateTo($"add-vocab-collection/{Id}");
         var resultsCollection = await Http.GetFromJsonAsync<List<CollectionMap>>("api/collectionMaps");
         if (resultsCollection is not null)
         {
