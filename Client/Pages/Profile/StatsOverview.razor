@@ -1,0 +1,58 @@
+﻿@page "/statistics"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@using DevelopmentProject.Shared.Entities
+
+<h3>Statistics Overview</h3>
+
+@if (StatisticsDetails.Count == 0)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Experience</th>
+                <th>Time</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var stat in StatisticsDetails)
+            {
+                <tr>
+                    <td>@stat.StatisticsId</td>
+                    <td>@stat.Experience</td>
+                    <td>@stat.Time</td>
+                    @* <td><button class="btn btn-primary" @onclick="@(() => ViewVocab(@collect.Id))"> View </button></td> *@
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    List<Statistics> StatisticsDetails = new List<Statistics>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadStatistics();
+    }
+
+    async Task LoadStatistics()
+    {
+        var results = await Http.GetFromJsonAsync<List<Statistics>>("api/statisticsData");
+
+        if (results is not null)
+            StatisticsDetails = results;
+    }
+
+
+}
+

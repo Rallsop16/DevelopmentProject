@@ -1,0 +1,93 @@
+﻿@page "/add-vocab-collection/{Id:int}"
+@using DevelopmentProject.Shared.Entities
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+
+<h1>Add Vocab To Collection</h1>
+
+@if (userIdVocab.Count == 0)
+{
+    <p><em>Loading...</em></p>
+    
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Original Word</th>
+                <th>Translated Word</th>
+                <th>Original Language</th>
+                <th>Translated Language</th>
+                <th>User Id</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vocab in userIdVocab)
+            {
+                <tr>
+                    <td>@vocab.VocabId</td>
+                    <td>@vocab.Original_word</td>
+                    <td>@vocab.Translated_word</td>
+                    <td>@vocab.Original_language</td>
+                    <td>@vocab.Translated_language</td>
+                    <td>@vocab.UserId</td>
+                    <td><button class="btn btn-primary" @onclick="@(() => AddVocabCollection(@vocab.VocabId))"> Add </button></td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    public CollectionMap newCollectionMap { get; set; } = new CollectionMap();
+
+    List<Vocab> vocabDetails = new List<Vocab>();
+    List<Vocab> userIdVocab = new List<Vocab>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadVocabs();
+    }
+
+
+    async void AddVocabCollection(int vocabularyId)
+    {
+        newCollectionMap.VocabId = vocabularyId;
+        newCollectionMap.CollectionVocabId = Id;
+
+        var result = await Http.PostAsJsonAsync("api/collectionMaps/", newCollectionMap);
+        //newCollectMap = await result.Content.ReadFromJsonAsync<CollectionMap>();
+
+
+    }
+
+   
+
+    async Task LoadVocabs()
+    {
+        var results = await Http.GetFromJsonAsync<List<Vocab>>("api/vocabs");
+
+        if (results is not null)
+        {
+            vocabDetails = results;
+            userIdVocab = vocabDetails.Where(x => x.UserId == 1).ToList(); //puts all the objects of UserId 1 in a list
+        }
+
+
+    }
+
+}
+
+
+

@@ -1,0 +1,166 @@
+﻿@page "/view-collection-vocab/{Id:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@using DevelopmentProject.Shared.Entities
+
+@if(Id == null)
+{
+	<h3>Collection Does Not Exist</h3>
+}
+else
+{
+	<h3>View Vocab in Collection @Id </h3>
+    
+}
+
+
+@if (allVocabInCollection.Count == 0)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Vocab Id</th>
+                <th>Original Word</th>
+                <th>Translated Word</th>
+                <th>Original Language</th>
+                <th>Translated Language</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vocab in allVocabInCollection)
+            {
+                <tr>
+                    <td>@vocab.VocabId</td>
+                    <td>@vocab.Original_word</td>
+                    <td>@vocab.Translated_word</td>
+                    <td>@vocab.Original_language</td>
+                    <td>@vocab.Translated_language</td>
+                    @* <td><button class="btn btn-primary" @onclick="@(() => EditCollection(@collect.CollectionVocabId))"> Edit </button></td>*@
+                    <td><button class="btn btn-danger" @onclick="@(() => RemoveVocab(@vocab.VocabId))"> Remove </button></td> 
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+
+<button class="btn btn-primary" @onclick="@(() => AddVocabToCollection(@Id))">Add new vocab to this collection </button>
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    int collectId = 0;
+
+    public CollectionMap newMap { get; set; } = new CollectionMap();
+    public Vocab VocabCollectionItem { get; set; } = new Vocab();
+
+    List<int> test = new List<int>();
+
+
+    List<CollectionMap> collectionMapDetails = new List<CollectionMap>();
+    List<CollectionMap> currentCollectionCollectionMap = new List<CollectionMap>();
+    List<CollectionMap> currentMaps = new List<CollectionMap>();
+    List<CollectionMap> mapsToRemove = new List<CollectionMap>();
+
+    List<int> collectionMapIdsToRemove = new List<int>(); //list of the collectionMapIds that have vocabId to remove
+    int j;
+
+
+    List<int> collectionVocabIds = new List<int>();
+
+    List<Vocab> tempVocabs = new List<Vocab>();
+    List<Vocab> vocabInCollection = new List<Vocab>();
+    List<Vocab> allVocabInCollection = new List<Vocab>();
+
+    List<Vocab> temp = new List<Vocab>();
+
+    int vocabIdMap = 0;
+    int num;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCollectionMap();
+    }
+
+    async Task LoadCollectionMap()
+    {
+        var results = await Http.GetFromJsonAsync<List<CollectionMap>>("api/collectionMaps");
+        var vocabResults = await Http.GetFromJsonAsync<List<Vocab>>("api/vocabs");
+
+        if (results is not null && vocabResults is not null)
+        {
+            collectionMapDetails = results;
+            tempVocabs = vocabResults;
+
+            currentCollectionCollectionMap = collectionMapDetails.Where(x => x.CollectionVocabId == Id).ToList(); //puts all the objects of UserId 1 in a list
+
+            for (int i = 0; i < currentCollectionCollectionMap.Count(); i++)
+            {
+                vocabIdMap = currentCollectionCollectionMap[i].VocabId;
+                collectionVocabIds.Add(vocabIdMap);
+            }
+
+            for(int i=0; i < collectionVocabIds.Count(); i++)
+            {
+                num = collectionVocabIds[i];
+                vocabInCollection = tempVocabs.Where(x => x.VocabId == num).ToList();
+                allVocabInCollection.AddRange(vocabInCollection);
+                //vocabInCollection = temp.Where(x => x.VocabId == i).ToList(); 
+            }
+
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await Http.GetFromJsonAsync<CollectionMap>($"api/collectionData/{(int)Id}");
+        if (result is not null)
+            newMap = result;
+    }
+
+    async Task HandleSubmit()
+    {
+
+        var result = await Http.PutAsJsonAsync($"api/collectionMaps/{Id}", newMap);
+        newMap = await result.Content.ReadFromJsonAsync<CollectionMap>();
+
+    }
+
+    void AddVocabToCollection(int Id)
+    {
+        NavigationManager.NavigateTo($"add-vocab-collection/{Id}");
+    }
+
+    async Task RemoveVocab(int Id)
+    {
+        //NavigationManager.NavigateTo($"add-vocab-collection/{Id}");
+        var resultsCollection = await Http.GetFromJsonAsync<List<CollectionMap>>("api/collectionMaps");
+        if (resultsCollection is not null)
+        {
+            currentMaps = resultsCollection; //all current collectionMaps
+
+            mapsToRemove = currentMaps.Where(x => x.VocabId == Id).ToList(); //list of type collectionMap containing the ones to remove
+
+            for (int i = 0; i < mapsToRemove.Count(); i++)
+            {
+                j = mapsToRemove[i].CollectionMapId;
+                collectionMapIdsToRemove.Add(j);
+            }
+
+            foreach(var a in collectionMapIdsToRemove)
+            {
+                await Http.DeleteAsync($"api/collectionMaps/{a}");
+            }
+        }
+    }
+
+}

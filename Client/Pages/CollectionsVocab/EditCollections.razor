@@ -1,0 +1,66 @@
+﻿@page "/edit-collection"
+@page "/edit-collection/{Id:int}"
+@inject HttpClient Http
+
+@using DevelopmentProject.Shared.Entities
+
+
+@if (Id == null)
+{
+	<h3>Add Collection</h3>
+}
+else
+{
+	<h3>Edit Collection </h3>
+}
+
+<EditForm Model="newCollect" OnSubmit="HandleSubmit">
+
+	<div>
+		<label for="CollectionVocabName">Collection Name</label>
+		<InputText id="CollectionVocabName" @bind-Value="newCollect.CollectionVocabName" class="form-control" />
+	</div>
+
+	<div>
+		<label for="UserId">UserId</label>
+		<InputNumber id="UserId" @bind-Value="newCollect.UserId" class="form-control" />
+	</div>
+
+
+	<button type="submit" class="btn btn-primary">Edit</button>
+
+</EditForm>
+
+
+
+@code {
+	[Parameter]
+	public int? Id { get; set; }
+	public CollectionVocab newCollect { get; set; } = new CollectionVocab();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if (Id is not null)
+		{
+			var result = await Http.GetFromJsonAsync<CollectionVocab>($"api/collectionData/{(int)Id}");
+			if (result is not null)
+				newCollect = result;
+		}
+
+	}
+
+	async Task HandleSubmit()
+	{
+		if (Id is not null)
+		{
+			var result = await Http.PutAsJsonAsync($"api/collectionData/{Id}", newCollect);
+			newCollect = await result.Content.ReadFromJsonAsync<CollectionVocab>();
+		}
+		else
+		{
+			var result = await Http.PostAsJsonAsync("api/collectionData/", newCollect);
+			newCollect = await result.Content.ReadFromJsonAsync<CollectionVocab>();
+		}
+	}
+}
+

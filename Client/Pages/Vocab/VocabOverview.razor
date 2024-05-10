@@ -1,0 +1,87 @@
+﻿@page "/vocabs"
+@using DevelopmentProject.Shared.Entities
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+
+<h3>Vocab Overview</h3>
+
+@if (userIdVocab.Count == 0)
+{
+    <p><em>Loading...</em></p>
+   
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Original Word</th>
+                <th>Translated Word</th>
+                <th>Original Language</th>
+                <th>Translated Language</th>
+                <th>User Id</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vocab in userIdVocab)
+            {
+                <tr>
+                    <td>@vocab.VocabId</td>
+                    <td>@vocab.Original_word</td>
+                    <td>@vocab.Translated_word</td>
+                    <td>@vocab.Original_language</td>
+                    <td>@vocab.Translated_language</td>
+                    <td>@vocab.UserId</td>
+                    <td><button class="btn btn-primary" @onclick="@(() => EditVocab(@vocab.VocabId))"> Edit </button></td>
+                    <td><button class="btn btn-danger" @onclick="@(() => RemoveVocab(@vocab.VocabId))"> Remove </button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<button class="btn btn-primary" @onclick="AddVocab">Add a new vocab </button>
+
+@code {
+
+    List<Vocab> vocabDetails = new List<Vocab>();
+    List<Vocab> userIdVocab = new List<Vocab>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadVocabs();
+    }
+
+    void EditVocab(int Id)
+    {
+        NavigationManager.NavigateTo($"edit-vocab/{Id}");
+    }
+    void AddVocab()
+    {
+        NavigationManager.NavigateTo("edit-vocab");
+    }
+
+    async Task RemoveVocab(int Id)
+    {
+        await Http.DeleteAsync($"api/vocabs/{Id}");
+        await LoadVocabs();
+    }
+
+    async Task LoadVocabs()
+    {
+        var results = await Http.GetFromJsonAsync<List<Vocab>>("api/vocabs");
+
+        if (results is not null)
+        {
+            vocabDetails = results;   
+            userIdVocab = vocabDetails.Where(x => x.UserId == 1).ToList(); //puts all the objects of UserId 1 in a list
+        }
+
+    }
+
+}
+
+

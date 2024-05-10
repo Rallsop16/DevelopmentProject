@@ -1,0 +1,114 @@
+﻿@page "/quiz-collection/{Id:int}"
+
+@using DevelopmentProject.Shared.Entities
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+
+<h3>Quiz</h3>
+
+
+
+@if(allVocabInCollection is not null )
+{
+    int currentQNum = 1;
+    @for (int i = 0; i < allVocabInCollection.Count; i++)
+    {
+        
+        <QuizQuestionCard Question="@allVocabInCollection[i]" currentQuestion="currentQNum" OnCheckGuess ="CheckGuess"/>
+        currentQNum = currentQNum + 1;
+    }
+}
+else
+{
+    <p> no vocab to test</p>
+}
+
+<p> CollectionID:  @Id</p>
+<p> Score: @correctAnswers / @allVocabInCollection.Count</p>
+
+<h1> vocab in collectionID: @allVocabInCollection.Count()</h1>
+
+<p>All collection maps: @specificCollectionMaps.Count()</p>
+<p>All vocabs: @specificVocabs.Count()</p>
+<p>CollectionMaps with specfic collectionId @MapsWithId.Count()</p>
+
+@foreach(var num in vocabsToQuizIds)
+{
+    <h1>@num</h1>
+}
+
+@code 
+{
+    [Parameter]
+    public int Id { get; set; }
+
+    List<CollectionMap> specificCollectionMaps = new List<CollectionMap>();
+
+    List<CollectionMap> MapsWithId = new List<CollectionMap>(); //list of collectionmaps with collectionvocabid as needed
+
+    List<int> vocabsToQuizIds = new List<int>();
+
+    List<Vocab> specificVocabs = new List<Vocab>();
+    List<Vocab> vocabInCollection = new List<Vocab>();
+    List<Vocab> allVocabInCollection = new List<Vocab>(); //all vocab in collection
+
+    int tempNum;
+    int k;
+  
+    int correctAnswers = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadVocab();
+    }
+
+    async Task LoadVocab()
+    {
+        //load collectionMaps
+        var results = await Http.GetFromJsonAsync<List<CollectionMap>>("api/collectionMaps");
+        //loads all vocabs
+        var vocabResults = await Http.GetFromJsonAsync<List<Vocab>>("api/vocabs");
+
+        if(results is not null && vocabResults is not null)
+        {
+            //collectionMaps
+            specificCollectionMaps = results;
+            specificVocabs = vocabResults;
+
+            MapsWithId = specificCollectionMaps.Where(x => x.CollectionVocabId == Id).ToList();
+
+            for (int i = 0; i < MapsWithId.Count(); i++)
+            {
+                tempNum = MapsWithId[i].VocabId; //checks the vocabId for each object in mapswithid
+                vocabsToQuizIds.Add(tempNum); //list of all the vocabIds in the collection
+            }
+
+            for (int i = 0; i < vocabsToQuizIds.Count(); i++)
+            {
+                k = vocabsToQuizIds[i];
+                vocabInCollection = specificVocabs.Where(x => x.VocabId == k).ToList();
+                allVocabInCollection.AddRange(vocabInCollection);
+            }
+        }
+
+
+
+    }
+
+    void CheckGuess(bool isCorrect)
+    {
+        if (isCorrect)
+        {
+            correctAnswers++;
+        }
+        else
+        {
+
+        }
+        //questionNum++;
+    }
+
+   
+
+}

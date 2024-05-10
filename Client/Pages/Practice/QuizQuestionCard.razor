@@ -1,0 +1,71 @@
+﻿@using DevelopmentProject.Shared.Entities
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+
+
+<div class="card text-center">
+    <div class="card-header header">
+        Question @currentQuestion
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">Translation</h5>
+         
+
+        <p class="card-text">What does @Question.Translated_word mean in @Question.Translated_language ?   </p>
+
+        <form @onsubmit="() => CheckGuess(Question.Original_word)">
+            <div class="form-group">
+                <label for="guess">Input word</label>
+                <input class="form-control input-sm" id="guess" @bind="guess" type="text">
+            </div>
+            <button type="submit" class="btn btn-primary">Check</button>
+        </form>
+        @if (correct == true)
+        {
+            <p>correct translation</p>
+        }
+
+    </div>
+    <div class="card-footer text-muted">
+    </div>
+</div>
+
+<br />
+<br />
+
+@code {
+
+    [Parameter]
+    public Vocab Question { get; set; }
+
+    [Parameter]
+    public int currentQuestion { get; set; }
+
+    string guess = "";
+
+    string correctTranslate = "";
+
+    bool correct;
+
+    
+
+    [Parameter]
+    public EventCallback<bool> OnCheckGuess { get; set; }
+
+    private async Task CheckGuess(string correctTranslation)
+    {
+        if(guess.ToLower() == correctTranslation.ToLower())
+        {
+            correct = true;
+
+        }
+        else
+        {
+            correct = false;
+        }
+
+        await OnCheckGuess.InvokeAsync(correct);
+    }
+
+}

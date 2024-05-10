@@ -1,0 +1,78 @@
+﻿@page "/edit-vocab"
+@page "/edit-vocab/{Id:int}"
+@inject HttpClient Http
+
+@using DevelopmentProject.Shared.Entities
+
+
+@if (Id == null)
+{
+	<h3>Add Vocab</h3>
+}
+else
+{
+	<h3>Edit Vocab </h3>
+}
+
+<EditForm Model="newVocab" OnSubmit="HandleSubmit">
+	
+	<div>
+		<label for="Original_word">Original Word</label>
+		<InputText id="Original_word" @bind-Value="newVocab.Original_word" class="form-control" />
+	</div>
+	<div>
+		<label for="Translated_word">Translated Word</label>
+		<InputText id="Translated_word" @bind-Value="newVocab.Translated_word" class="form-control" />
+	</div>
+	<div>
+		<label for="Original_language">Original Language</label>
+		<InputText id="Original_language" @bind-Value="newVocab.Original_language" class="form-control" />
+	</div>
+	<div>
+		<label for="Translated_language">Translated Language</label>
+		<InputText id="Translated_language" @bind-Value="newVocab.Translated_language" class="form-control" />
+	</div>
+
+    <div>
+		<label for="UserId">UserId</label>
+		<InputNumber id="UserId" @bind-Value="newVocab.UserId" class="form-control" />
+	</div> 
+
+
+	<button type="submit" class="btn btn-primary">Edit</button>
+
+</EditForm>
+
+
+
+@code {
+	[Parameter]
+	public int? Id { get; set; }
+	public Vocab newVocab { get; set; } = new Vocab();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if (Id is not null)
+		{
+			var result = await Http.GetFromJsonAsync<Vocab>($"api/vocabs/{(int)Id}");
+			if (result is not null)
+				newVocab = result;
+		}
+
+	}
+
+	async Task HandleSubmit()
+	{
+		if (Id is not null)
+		{
+			var result = await Http.PutAsJsonAsync($"api/vocabs/{Id}", newVocab);
+			newVocab = await result.Content.ReadFromJsonAsync<Vocab>();
+		}
+		else
+		{
+			var result = await Http.PostAsJsonAsync("api/vocabs/", newVocab);
+			newVocab = await result.Content.ReadFromJsonAsync<Vocab>();
+		}
+	}
+}
+
